@@ -2,9 +2,11 @@ import asyncio
 import getpass
 import json
 from math import sqrt # distance
+from copy import deepcopy
 import os
 import time
 from common import Map
+from copy import deepcopy
 
 # Next 4 lines are not needed for AI agents, please remove them from your code!
 import pygame
@@ -34,7 +36,7 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     await websocket.recv()
                 )  # receive game update, this must be called timely or your game will get out of sync with the server
                 state['map'] = Map(state['grid'])
-                print(state['map'].piece_coordinates('A'))
+                print(state['map'].piece_coordinates('A')) # returns current coordinates
                 
                 print(state.get("cursor"))
 
@@ -46,22 +48,22 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     continue
 
             except websockets.exceptions.ConnectionClosedOK:
-                print("Server has cleanly disconnected us")
+                print("Server has cleanly disconnected us") 
                 return
 
             # Next line is not needed for AI agent
             #pygame.display.flip()
 
-# def get_possible_placements(floor):
-#     """ Return every possible placements for the given car """
-#     lst = []
+def get_possible_placements(PieceShape, floor):
+    """ Return every possible placements for the given car """
+    lst = []
 
-#     for a in range(len):
-#         print(lst)
-#     return lst
+    for a in range(len):
+        print(lst)
+    return lst
     
 # def get_floor(game):
-#     higher_position = [HEIGHT]*WIDTH
+#     higher_position = [HEIGHT]*WIDTH # higher position
 #     for (x,y) in game:
 #         if y < higher_position[x-1]:
 #             higher_position[x-1] = y
