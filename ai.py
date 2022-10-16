@@ -4,10 +4,10 @@ from itertools import product
 from common import Coordinates, Map
 from copy import deepcopy
 
-class IA(SearchDomain):
-
-    def __init__(self):
-        pass
+class Ai():
+    def __init__(self, goal):
+        self.goal = goal
+        
     def actions(self,city):
        return ["a", "w", "d", "s", " "]
     def result(self,city,action):
@@ -16,3 +16,4 @@ class IA(SearchDomain):
         pass
     def heuristic(self, city, goal_city):
         pass
+    

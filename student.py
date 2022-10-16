@@ -1,12 +1,12 @@
 import asyncio
 import getpass
 import json
-from math import sqrt # distance
-from copy import deepcopy
 import os
-import time
+from re import S
+from telnetlib import SE
 from common import Map
-from copy import deepcopy
+from Ai import Ai
+from tree_search import *
 
 # Next 4 lines are not needed for AI agents, please remove them from your code!
 import pygame
@@ -23,6 +23,8 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         # Receive information about static game properties
         await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
 
+        agent = Ai()
+
         pc = 0 # program counter
         
         # Next 3 lines are not needed for AI agent
@@ -38,14 +40,19 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                 state['map'] = Map(state['grid'])
                 print(state['map'].piece_coordinates('A')) # returns current coordinates
                 
-                print(state.get("cursor"))
+                p = SearchProblem( agent, state)
+                s = SearchTree(p, strategy='a*')
+                s.search()
 
-                if state.get("game") is None: # Game dimensions
-                    global HEIGHT
-                    global WIDTH
-                    WIDTH = state["dimensions"][1] # DOUBT IT BUT OK
-                    HEIGHT = state["dimensions"][1]
-                    continue
+                print(s.plan)
+                
+
+                # if state.get("game") is None: # Game dimensions
+                #     global HEIGHT
+                #     global WIDTH
+                #     WIDTH = state["dimensions"][1] # DOUBT IT BUT OK
+                #     HEIGHT = state["dimensions"][1]
+                #     continue
 
             except websockets.exceptions.ConnectionClosedOK:
                 print("Server has cleanly disconnected us") 
