@@ -38,13 +38,6 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
                     await websocket.recv()
                 )  # receive game update, this must be called timely or your game will get out of sync with the server
                 state['map'] = Map(state['grid'])
-                print(state['map'].piece_coordinates('A')) # returns current coordinates
-                
-                p = SearchProblem( agent, state)
-                s = SearchTree(p, strategy='a*')
-                s.search()
-
-                print(s.plan)
                 
 
                 # if state.get("game") is None: # Game dimensions
