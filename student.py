@@ -2,20 +2,16 @@ import asyncio
 import getpass
 import json
 import os
-from re import S
-from telnetlib import SE
-from common import Map
-from Ai import Ai
+from IA.State import State
+from IA.IA import IA
 from tree_search import *
 
-# Next 4 lines are not needed for AI agents, please remove them from your code!
-import pygame
 import websockets
 
-pygame.init()
-program_icon = pygame.image.load("data/icon2.png")
-pygame.display.set_icon(program_icon)
-
+def getNextMove(state, plan):
+    cursor = state['cursor']
+    selected = state['selected']
+    print(cursor, selected)
 
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
     async with websockets.connect(f"ws://{server_address}/player") as websocket:
@@ -23,52 +19,35 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         # Receive information about static game properties
         await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
 
-        agent = Ai()
+        agent = IA()
 
         pc = 0 # program counter
-        
-        # Next 3 lines are not needed for AI agent
-        # SCREEN = pygame.display.set_mode((299, 123))
-        # SPRITES = pygame.image.load("data/pad.png").convert_alpha()
-        # SCREEN.blit(SPRITES, (0, 0))
+        plan = []
 
         while True:
             try:
-                state = json.loads(
+                server_state = json.loads(
                     await websocket.recv()
                 )  # receive game update, this must be called timely or your game will get out of sync with the server
-                state['map'] = Map(state['grid'])
                 
+                state = State(server_state)
 
-                # if state.get("game") is None: # Game dimensions
-                #     global HEIGHT
-                #     global WIDTH
-                #     WIDTH = state["dimensions"][1] # DOUBT IT BUT OK
-                #     HEIGHT = state["dimensions"][1]
-                #     continue
+                if plan:
+                    initial_state = State(server_state)
+                    p = SearchProblem(agent, initial_state)
+                    t = SearchTree(p)
+                    t.search()
+                    plan = t.plan
+                    continue
+                
+                key = getNextMove(server_state,plan)
+                    
+                websocket.send(json.dumps({"cmd": "key", "key": key}))  
 
             except websockets.exceptions.ConnectionClosedOK:
                 print("Server has cleanly disconnected us") 
                 return
 
-            # Next line is not needed for AI agent
-            #pygame.display.flip()
-
-def get_possible_placements(PieceShape, floor):
-    """ Return every possible placements for the given car """
-    lst = []
-
-    for a in range(len):
-        print(lst)
-    return lst
-    
-# def get_floor(game):
-#     higher_position = [HEIGHT]*WIDTH # higher position
-#     for (x,y) in game:
-#         if y < higher_position[x-1]:
-#             higher_position[x-1] = y
-
-#     return higher_position
 
 # DO NOT CHANGE THE LINES BELLOW
 # You can change the default values using the command line, example:

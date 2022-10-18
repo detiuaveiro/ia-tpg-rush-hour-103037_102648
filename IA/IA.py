@@ -2,8 +2,13 @@ from array import array
 from copy import deepcopy
 from typing import List
 from tree_search import SearchDomain
-from Action import Action
-from State import State
+from IA.Action import Action
+from IA.State import State
+
+def pp(str, size):
+    while str:
+        print(str[:size])
+        str = str[size:]
 
 class IA(SearchDomain):
 
@@ -12,13 +17,15 @@ class IA(SearchDomain):
 
     def actions(self, state: State) -> List[Action]:
         actions = []
-        pieces = {s for s in state.grid if s!=state.empty_tile}
+        pieces = {s for s in state.grid if (s!=state.empty_tile and s!=state.wall_tile)}
         for piece in pieces:
             directions = [[-1,0],[0,-1],[1,0],[0,1]]
             for i in range(len(directions)):
                 if state.move(piece, directions[i]):
                     state.move(piece, directions[(i+2)%4])
                     actions.append(Action(piece, directions[i]))
+        # pp(state.grid, 6)
+        # print(actions)
         return actions
 
     def result(self, state: State, action: Action) -> State:
@@ -30,12 +37,12 @@ class IA(SearchDomain):
         return 1
     
     def heuristic(self, state: State) -> int:
-        return 17-state.piece_coordinates("A")[1]
+        return len([i for i in state.grid[12:18] if i not in {'x','o','A'}]) + (17-state.piece_coordinates("A")[1])*1
 
     def satisfies(self, state: State) -> bool:
         return state.piece_coordinates("A")[1]==17
 
-    def onpath(self, state: State, path) -> bool:
+    def onpath(self, state: State, path: List[State]) -> bool:
         for s in path:
             if state.grid==s.grid:
                 return True

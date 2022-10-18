@@ -54,17 +54,13 @@ class SearchNode:
 
 
 class SearchTree:
-    def __init__(self,problem, strategy='breadth'): 
+    def __init__(self,problem): 
         self.problem = problem
         root = SearchNode(problem.initial, None)
         self.open_nodes = [root]
-        self.strategy = strategy
         self.solution = None
-        self.non_terminals = 0
-        self.terminals = 0
-        self.highest_cost_nodes = []
-        self.average_depth = 0
         self.plan = []
+        self.searched_states = set()
     
     @property
     def length(self):
@@ -87,64 +83,54 @@ class SearchTree:
         return(path)
 
     # procurar a solucao
-    def search(self, limit = None):
-        self.non_terminals = 0
-        self.terminals = 1
+    def search(self):
         while self.open_nodes != []:
             node = self.open_nodes.pop(0)
-            if limit and node.depth > limit: # used for limit search
-                self.terminals-=1
-                continue
+
             if self.problem.goal_test(node.state): # check for goal found
                 self.solution = node
-                # max_cost = self.open_nodes[-1].cost
-                # for i in reversed(self.open_nodes):
-                #     if i.cost < max_cost: break
-                #     self.highest_cost_nodes = [i] + self.highest_cost_nodes
                 parent = node
                 while parent:
                     self.plan = [parent.action] + self.plan
                     parent = parent.parent
                 self.plan = self.plan[1:]
-                self.average_depth /= self.non_terminals + self.terminals
-                print("NODESTATE")
                 return self.get_path(node)
-            self.non_terminals+=1
-            self.terminals-=1
+                
             lnewnodes = []
             for action in self.problem.domain.actions(node.state):
                 newstate = self.problem.domain.result(node.state,action)
-                # print("NEWSTATE",newstate)
-                if not self.problem.domain.onpath(newstate, self.get_path(node)):
+                if newstate.grid not in self.searched_states:
+                    self.searched_states.add(newstate.grid)
                     added_cost = self.problem.domain.cost(node.state,(node.state, newstate))
                     newnode = SearchNode(
                         newstate,   
                         node,
-                        depth = node.depth+1, 
                         cost = node.cost + added_cost,
                         heuristic = self.problem.domain.heuristic(newstate),
                         action = action)
                     lnewnodes.append(newnode)
-                    self.average_depth += newnode.depth
-                    self.terminals+=1
             self.add_to_open(lnewnodes)
         return None
 
     # juntar novos nos a lista de nos abertos de acordo com a estrategia
-    def add_to_open(self,lnewnodes):
-        if self.strategy == 'breadth':
-            self.open_nodes.extend(lnewnodes)
-        elif self.strategy == 'depth':
-            self.open_nodes[:0] = lnewnodes
-        elif self.strategy == 'uniform':
-            self.open_nodes.extend(lnewnodes)
-            self.open_nodes.sort(key=lambda e: e.cost)
-        elif self.strategy == 'greedy':
-            self.open_nodes.extend(lnewnodes)
-            self.open_nodes.sort(key=lambda e: e.heuristic)
-        elif self.strategy == 'a*':
-            self.open_nodes.extend(lnewnodes)
-            self.open_nodes.sort(key=lambda e: e.heuristic+e.cost)
+    # def add_to_open(self,lnewnodes):
+    #     if self.strategy == 'breadth':
+    #         self.open_nodes.extend(lnewnodes)
+    #     elif self.strategy == 'depth':
+    #         self.open_nodes[:0] = lnewnodes
+    #     elif self.strategy == 'uniform':
+    #         self.open_nodes.extend(lnewnodes)
+    #         self.open_nodes.sort(key=lambda e: e.cost)
+    #     elif self.strategy == 'greedy':
+    #         self.open_nodes.extend(lnewnodes)
+    #         self.open_nodes.sort(key=lambda e: e.heuristic)
+    #     elif self.strategy == 'a*':
+    #         self.open_nodes.extend(lnewnodes)
+    #         self.open_nodes.sort(key=lambda e: e.heuristic+e.cost)
+    def add_to_open(self, lnewnodes):
+        # TODO, sort é lento, usar binary tree de futuro
+        self.open_nodes.extend(lnewnodes)
+        self.open_nodes.sort(key=lambda e: e.heuristic+e.cost)
 
 if __name__ == "__main__":
     print("helo")
