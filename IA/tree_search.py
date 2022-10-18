@@ -54,13 +54,13 @@ class SearchNode:
 
 
 class SearchTree:
-    def __init__(self,problem): 
+    def __init__(self,problem,searched_states=None): 
         self.problem = problem
         root = SearchNode(problem.initial, None)
         self.open_nodes = [root]
         self.solution = None
         self.plan = []
-        self.searched_states = set()
+        self.searched_states = searched_states or set()
     
     @property
     def length(self):
@@ -101,7 +101,7 @@ class SearchTree:
                 newstate = self.problem.domain.result(node.state,action)
                 if newstate.grid not in self.searched_states:
                     self.searched_states.add(newstate.grid)
-                    added_cost = self.problem.domain.cost(node.state,(node.state, newstate))
+                    added_cost = self.problem.domain.cost(node.state,action)
                     newnode = SearchNode(
                         newstate,   
                         node,

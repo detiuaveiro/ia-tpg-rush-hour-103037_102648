@@ -34,7 +34,8 @@ class IA(SearchDomain):
         return newstate
 
     def cost(self, state: State, action: Action) -> int:
-        return 1
+        # print(action)
+        return 1 + state.piece_manhattan_distance(action.piece)[1]/3
     
     def heuristic(self, state: State) -> int:
         return len([i for i in state.grid[12:18] if i not in {'x','o','A'}]) + (17-state.piece_coordinates("A")[1])*1

@@ -26,6 +26,15 @@ class State:
     def piece_coordinates(self, piece: str):
         return [i for i,s in enumerate(self.grid) if s==piece]
 
+    
+    def piece_manhattan_distance(self, piece):
+        pieces = self.piece_coordinates(piece)
+        min = (None,None)
+        for i, piece in enumerate(pieces):
+            piece_distance = abs(self.cursor[0]-piece%self.grid_size)+abs(self.cursor[1]-int(piece/self.grid_size))
+            min = (pieces[i],piece_distance) if not min[0] or min[1]>piece_distance else min
+        return min
+
     def move(self, piece, direction):
         assert piece!=self.wall_tile
 
@@ -35,9 +44,6 @@ class State:
             return None
         if direction[1]!=0 and (piece_coord[1]-piece_coord[0])!=self.grid_size:
             return None
-
-        def sum(a,b): 
-            return [a[0]+b[0],a[1]+b[1]]
         
         # check for walls and pices on the way
         if direction[0]==1: # move to the right
