@@ -6,13 +6,14 @@ import os
 from IA.State import State
 from IA.Action import Action
 from IA.IA import IA
-from IA.tree_search import *
+from IA.tree_search import SearchProblem, SearchTree
 
 import time
 
 import websockets
 
-def solve_puzzle(server_state, searched_states=None):
+def solve_puzzle(server_state):
+    # calculate level
     print("THINKING...")
     st = time.time()
     agent = IA()
@@ -22,7 +23,7 @@ def solve_puzzle(server_state, searched_states=None):
     t.search()
     print("Done in", time.time()-st)
     print("Plan len:",len(t.plan))
-    return (t.plan, t.searched_states)
+    return t.plan
 
 def getNextMove(server_state, plan):
     cursor = server_state['cursor']
@@ -30,16 +31,18 @@ def getNextMove(server_state, plan):
 
     action: Action = plan[0]
     state: State = State(server_state)
-    # print(action)
+    # test if some piece moved randomly and blocked current move
     if not state.move(action.piece, action.direction): 
         return None, None
-    state.move(action.piece, [action.direction[0]*-1, action.direction[1]*-1])
+    state.move(action.piece, [action.direction[0]*-1, action.direction[1]*-1]) # undo test move
 
     if selected!=action.piece: # piece not selected
         if selected!="": return " ", plan # disselect wrong piece
+
         piece_cood0 = state.piece_manhattan_distance(action.piece)[0]
         piece_cood0 = [piece_cood0%state.grid_size, int(piece_cood0/state.grid_size)]
         distance = [ (cursor[0]-piece_cood0[0]) , (cursor[1]-piece_cood0[1]) ]
+
         if abs(distance[0])+abs(distance[1]) != 0:
             if distance[0]!=0: return "a" if distance[0]>0 else "d", plan # move cursor horizontaly
             if distance[1]!=0: return "w" if distance[1]>0 else "s", plan # move cursor vertically
@@ -58,35 +61,24 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
         await websocket.recv() # clear server queue
 
-        pc = 0 # program counter
         plan = []
-        moves = []
-        searched_states = None
-        expected_state = None
-        searched_states_level = 0
 
         while True:
             try:
                 server_state = json.loads( await websocket.recv() )  # receive game update, this must be called timely or your game will get out of sync with the server
-                state = State(server_state)
-
-                if server_state['level']!=searched_states_level:
-                    searched_states_level = server_state['level']
-                    searched_states = None
                 
                 if not plan:
                     print("NOT PLAN")
-                    plan, searched_states = solve_puzzle(server_state, searched_states)
+                    plan = solve_puzzle(server_state)
                     continue
                 
                 key, plan = getNextMove(server_state,plan)
 
                 if not key: 
                     print("NOT KEY")
-                    plan, searched_states = solve_puzzle(server_state, searched_states)
+                    plan = solve_puzzle(server_state)
                     continue
                 
-                # print(key)
                 await websocket.send(json.dumps({"cmd": "key", "key": key}))  
 
             except websockets.exceptions.ConnectionClosedOK:

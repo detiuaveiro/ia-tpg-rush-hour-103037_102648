@@ -69,6 +69,9 @@ class State:
             elif direction[1]!=0:
                 new_pos = pos + direction[1]*self.grid_size
             self.grid = self.grid[:new_pos] + piece + self.grid[new_pos+1:]
+
+        manhattan = self.piece_manhattan_distance(piece)
+        self.cursor = [manhattan[0]%self.grid_size, int(manhattan[0]/self.grid_size) ]
         
         return True
 

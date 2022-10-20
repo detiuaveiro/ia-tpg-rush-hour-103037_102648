@@ -54,13 +54,13 @@ class SearchNode:
 
 
 class SearchTree:
-    def __init__(self,problem,searched_states=None): 
+    def __init__(self,problem): 
         self.problem = problem
         root = SearchNode(problem.initial, None)
         self.open_nodes = [root]
         self.solution = None
         self.plan = []
-        self.searched_states = searched_states or set()
+        self.searched_states = set()
     
     @property
     def length(self):
