@@ -33,3 +33,4 @@ python -m pygame.examples.aliens
 
 # Tested on:
 - OSX Monterey 12.5.1
+- OSX Monterey 12.2 
