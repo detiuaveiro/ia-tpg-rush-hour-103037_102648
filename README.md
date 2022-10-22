@@ -1,3 +1,6 @@
+# WARNING
+Needs python 3.10.x or above to run, do to a standart library use "bisect"
+
 # ia-rush
 Projecto de Inteligência Artificial 2022 - Rush Hour
 
