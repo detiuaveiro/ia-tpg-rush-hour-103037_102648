@@ -1,4 +1,8 @@
 from abc import ABC, abstractmethod
+from typing import Dict, List
+import bisect
+
+# from State import State
 
 class SearchDomain(ABC):
     # construtor
@@ -32,7 +36,7 @@ class SearchDomain(ABC):
 # Problemas concretos a resolver
 # dentro de um determinado dominio
 class SearchProblem:
-    def __init__(self, domain, initial):
+    def __init__(self, domain, initial, nodes = dict()):
         self.domain = domain
         self.initial = initial
     def goal_test(self, state):
@@ -40,13 +44,14 @@ class SearchProblem:
 
 
 class SearchNode:
-    def __init__(self,state,parent,depth = 0,cost = 0,heuristic = 0, action = None): 
+    def __init__(self,state,parent,depth = 0,cost = 0,heuristic = 0, action = None, on_solution = None): 
         self.state = state
         self.parent = parent
         self.depth = depth
         self.cost = cost
         self.heuristic = heuristic
         self.action = action
+        self.on_solution = on_solution
     def __str__(self):
         return "no(" + str(self.state) + "," + str(self.parent) + ")"
     def __repr__(self):
@@ -54,13 +59,13 @@ class SearchNode:
 
 
 class SearchTree:
-    def __init__(self,problem): 
-        self.problem = problem
+    def __init__(self,problem, solutions={}): 
+        self.problem: SearchProblem = problem
         root = SearchNode(problem.initial, None)
         self.open_nodes = [root]
-        self.solution = None
         self.plan = []
         self.searched_states = set()
+        self.solutions = solutions
     
     @property
     def length(self):
@@ -91,46 +96,44 @@ class SearchTree:
                 self.solution = node
                 parent = node
                 while parent:
+                    self.solutions[parent.state.grid] = True
                     self.plan = [parent.action] + self.plan
                     parent = parent.parent
                 self.plan = self.plan[1:]
                 return self.get_path(node)
                 
             lnewnodes = []
-            for action in self.problem.domain.actions(node.state):
-                newstate = self.problem.domain.result(node.state,action)
+            actions = self.problem.domain.actions(node.state)
+            if len(actions)==0:
+                node.on_solution = False
+            for action, newstate in actions:
                 if newstate.grid not in self.searched_states:
                     self.searched_states.add(newstate.grid)
-                    added_cost = self.problem.domain.cost(node.state,action)
                     newnode = SearchNode(
                         newstate,   
                         node,
-                        cost = node.cost + added_cost,
+                        cost = node.cost + self.problem.domain.cost(node.state,action),
                         heuristic = self.problem.domain.heuristic(newstate),
-                        action = action)
+                        action = action,
+                        on_solution = self.solutions[newstate.grid] if newstate.grid in self.solutions else None
+                    )
                     lnewnodes.append(newnode)
             self.add_to_open(lnewnodes)
         return None
 
-    # juntar novos nos a lista de nos abertos de acordo com a estrategia
-    # def add_to_open(self,lnewnodes):
-    #     if self.strategy == 'breadth':
-    #         self.open_nodes.extend(lnewnodes)
-    #     elif self.strategy == 'depth':
-    #         self.open_nodes[:0] = lnewnodes
-    #     elif self.strategy == 'uniform':
-    #         self.open_nodes.extend(lnewnodes)
-    #         self.open_nodes.sort(key=lambda e: e.cost)
-    #     elif self.strategy == 'greedy':
-    #         self.open_nodes.extend(lnewnodes)
-    #         self.open_nodes.sort(key=lambda e: e.heuristic)
-    #     elif self.strategy == 'a*':
-    #         self.open_nodes.extend(lnewnodes)
-    #         self.open_nodes.sort(key=lambda e: e.heuristic+e.cost)
-    def add_to_open(self, lnewnodes):
-        # TODO, sort é lento, usar binary tree de futuro
-        self.open_nodes.extend(lnewnodes)
-        self.open_nodes.sort(key=lambda e: e.heuristic+e.cost)
-
+    def add_to_open(self, lnewnodes: List[SearchNode]):
+        # for newnode in lnewnodes:
+        #     if newnode.on_solution:
+        #         self.open_nodes.insert(0, newnode)
+        #         return
+        
+        # lnewnodes
+        
+        # use a binary tree
+        for node in [newnode for newnode in lnewnodes if newnode.on_solution!=False]:
+            bisect.insort(self.open_nodes, node, key=lambda e: e.on_solution or e.heuristic+e.cost)
+        # self.open_nodes.extend(lnewnodes)
+        # self.open_nodes.sort(key=lambda e: e.heuristic+e.cost)
+        
 if __name__ == "__main__":
     print("helo")

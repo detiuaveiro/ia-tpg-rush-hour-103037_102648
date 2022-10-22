@@ -14,15 +14,15 @@ class IA(SearchDomain):
         pass
 
     def actions(self, state: State) -> List[Action]:
-        actions = []
+        actions_array = []
         pieces = {s for s in state.grid if (s!=state.empty_tile and s!=state.wall_tile)}
         for piece in pieces:
             directions = [[-1,0],[0,-1],[1,0],[0,1]]
             for i in range(len(directions)):
-                if state.move(piece, directions[i]):
-                    state.move(piece, directions[(i+2)%4])
-                    actions.append(Action(piece, directions[i]))
-        return actions
+                newstate = State({"dimensions":[state.grid_size,0], "grid": "x "+state.grid+" x", "cursor":state.cursor, "selected":state.selected})
+                if newstate.move(piece, directions[i]):
+                    actions_array.append((Action(piece, directions[i]), newstate))
+        return actions_array
 
     def result(self, state: State, action: Action) -> State:
         newstate = State({"dimensions":[state.grid_size,0], "grid": "x "+state.grid+" x", "cursor":state.cursor, "selected":state.selected})
@@ -31,11 +31,13 @@ class IA(SearchDomain):
 
     def cost(self, state: State, action: Action) -> int:
         # 1 + distance from previus cursor position
-        return 1 + state.piece_manhattan_distance(action.piece)[1]/12 # 12 is the max distance, 1 <= cost <= 2
+        distance = state.piece_manhattan_distance(action.piece)
+        return 2 + abs(distance[0])+abs(distance[1])
+        # return 1
     
     def heuristic(self, state: State) -> int:
         # heuristic -> number of pieces in front plus numbers of player car moves needed to strait finish
-        return len([i for i in state.grid[12:18] if i not in {'x','o','A'}]) + (17-state.piece_coordinates("A")[1])
+        return len([i for i in state.grid[12:18] if i not in {'x','o','A'}])
 
     def satisfies(self, state: State) -> bool:
         return state.piece_coordinates("A")[1]==17

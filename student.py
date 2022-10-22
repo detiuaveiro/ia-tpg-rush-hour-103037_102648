@@ -12,18 +12,22 @@ import time
 
 import websockets
 
-def solve_puzzle(server_state):
+def solve_puzzle(server_state, current_level = 0, solutions = {}):
     # calculate level
+    print("\nLevel",server_state['level'])
+    if server_state['level']!=current_level:
+        current_level = server_state['level']
+        solutions = {}
     print("THINKING...")
     st = time.time()
     agent = IA()
     initial_state = State(server_state)
-    p = SearchProblem(agent, initial_state)
+    p = SearchProblem(agent, initial_state, solutions)
     t = SearchTree(p)
     t.search()
     print("Done in", time.time()-st)
     print("Plan len:",len(t.plan))
-    return t.plan
+    return t.plan, t.solutions
 
 def getNextMove(server_state, plan):
     cursor = server_state['cursor']
@@ -32,16 +36,15 @@ def getNextMove(server_state, plan):
     action: Action = plan[0]
     state: State = State(server_state)
     # test if some piece moved randomly and blocked current move
-    if not state.move(action.piece, action.direction): 
+    if not state.testmove(action.piece, action.direction): 
         return None, None
-    state.move(action.piece, [action.direction[0]*-1, action.direction[1]*-1]) # undo test move
+    # state.move(action.piece, [action.direction[0]*-1, action.direction[1]*-1]) # undo test move
 
     if selected!=action.piece: # piece not selected
         if selected!="": return " ", plan # disselect wrong piece
 
-        piece_cood0 = state.piece_manhattan_distance(action.piece)[0]
-        piece_cood0 = [piece_cood0%state.grid_size, int(piece_cood0/state.grid_size)]
-        distance = [ (cursor[0]-piece_cood0[0]) , (cursor[1]-piece_cood0[1]) ]
+        distance = state.piece_manhattan_distance(action.piece)
+        # print(distance)
 
         if abs(distance[0])+abs(distance[1]) != 0:
             if distance[0]!=0: return "a" if distance[0]>0 else "d", plan # move cursor horizontaly
@@ -54,6 +57,7 @@ def getNextMove(server_state, plan):
 
     return None, None
 
+from array import array
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
     async with websockets.connect(f"ws://{server_address}/player") as websocket:
 
@@ -63,20 +67,24 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
         plan = []
 
+        nodes = dict()
+        current_level = 0
+        solutions = {}
+        
         while True:
             try:
                 server_state = json.loads( await websocket.recv() )  # receive game update, this must be called timely or your game will get out of sync with the server
                 
                 if not plan:
                     print("NOT PLAN")
-                    plan = solve_puzzle(server_state)
+                    plan, solutions = solve_puzzle(server_state, current_level, solutions)
                     continue
                 
                 key, plan = getNextMove(server_state,plan)
 
                 if not key: 
                     print("NOT KEY")
-                    plan = solve_puzzle(server_state)
+                    plan, solutions = solve_puzzle(server_state, current_level, solutions)
                     continue
                 
                 await websocket.send(json.dumps({"cmd": "key", "key": key}))  
