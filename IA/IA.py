@@ -40,7 +40,7 @@ class IA(SearchDomain):
         return len([i for i in state.grid[12:18] if i not in {'x','o','A'}])
 
     def satisfies(self, state: State) -> bool:
-        return state.piece_coordinates("A")[1]==17
+        return state.piece_coordinates("A")[0]==16
 
     def onpath(self, state: State, path: List[State]) -> bool:
         for s in path:

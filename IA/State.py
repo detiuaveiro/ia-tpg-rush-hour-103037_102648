@@ -25,10 +25,25 @@ class State:
             return self.grid[cursor[1]*self.grid_size+cursor[0]]
      
     def piece_coordinates(self, piece: str):
-        if piece in self.pieces:
-            return self.pieces[piece]
-        self.pieces[piece] = [i for i in range(36) if self.grid[i]==piece]
-        return self.pieces[piece]
+        # if piece in self.pieces:
+        #     return self.pieces[piece]
+        # self.pieces[piece] = [i for i in range(36) if self.grid[i]==piece]
+        # return self.pieces[piece]
+    
+        indexs = []
+        for i in range(0,36):
+            if self.grid[i]==piece:
+                if self.grid[i+1]==piece:
+                    if (i+2)%6!=0 and self.grid[i+2]==piece:
+                        return [i,i+1,i+2]
+                    else:
+                        return [i,i+1]
+                else:
+                    if (i+12)<=35 and self.grid[i+12]==piece:
+                        return [i,i+6,i+12]
+                    else:
+                        return [i,i+6]
+    
         # print(piece)
         # print(self.grid)
         # print(self.grid.index(piece))
