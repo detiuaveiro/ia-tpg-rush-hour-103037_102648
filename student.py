@@ -7,6 +7,7 @@ from IA.State import State
 from IA.Action import Action
 from IA.IA import IA
 from IA.tree_search import SearchProblem, SearchTree
+from test_tree_search import calculatePlans
 
 import time
 
@@ -61,19 +62,20 @@ from array import array
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
     async with websockets.connect(f"ws://{server_address}/player") as websocket:
 
+        plans = calculatePlans()
+
         # Receive information about static game properties
         await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
         await websocket.recv() # clear server queue
 
-        plan = []
-
-        nodes = dict()
         current_level = 0
         solutions = {}
         
         while True:
             try:
                 server_state = json.loads( await websocket.recv() )  # receive game update, this must be called timely or your game will get out of sync with the server
+                
+                plan,solutions = plans[server_state["level"]]
                 
                 if not plan:
                     print("NOT PLAN")
