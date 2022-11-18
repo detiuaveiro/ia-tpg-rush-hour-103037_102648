@@ -1,8 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, List
 import bisect
-
-# from State import State
 
 class SearchDomain(ABC):
     # construtor
@@ -66,6 +63,7 @@ class SearchTree:
         self.plan = []
         self.searched_states = set()
         self.solutions = solutions
+        self.all_nodes = dict()
     
     @property
     def length(self):
@@ -83,9 +81,7 @@ class SearchTree:
     def get_path(self,node):
         if node.parent == None:
             return [node.state]
-        path = self.get_path(node.parent)
-        path += [node.state]
-        return(path)
+        return self.get_path(node.parent) + [node.state]
 
     # procurar a solucao
     def search(self):
@@ -121,19 +117,9 @@ class SearchTree:
             self.add_to_open(lnewnodes)
         return None
 
-    def add_to_open(self, lnewnodes: List[SearchNode]):
-        # for newnode in lnewnodes:
-        #     if newnode.on_solution:
-        #         self.open_nodes.insert(0, newnode)
-        #         return
-        
-        # lnewnodes
-        
-        # use a binary tree
+    def add_to_open(self, lnewnodes):
         for node in [newnode for newnode in lnewnodes if newnode.on_solution!=False]:
             bisect.insort(self.open_nodes, node, key=lambda e: e.on_solution or e.heuristic+e.cost)
-        # self.open_nodes.extend(lnewnodes)
-        # self.open_nodes.sort(key=lambda e: e.heuristic+e.cost)
         
 if __name__ == "__main__":
     print("helo")

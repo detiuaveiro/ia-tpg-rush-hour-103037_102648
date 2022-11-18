@@ -1,5 +1,3 @@
-
-
 class State:
     empty_tile = "o"
     wall_tile = "x"
@@ -25,13 +23,8 @@ class State:
             return self.grid[cursor[1]*self.grid_size+cursor[0]]
      
     def piece_coordinates(self, piece: str):
-        # if piece in self.pieces:
-        #     return self.pieces[piece]
-        # self.pieces[piece] = [i for i in range(36) if self.grid[i]==piece]
-        # return self.pieces[piece]
-    
-        indexs = []
-        for i in range(0,36):
+        i = 0
+        while i < 36:
             if self.grid[i]==piece:
                 if self.grid[i+1]==piece:
                     if (i+2)%6!=0 and self.grid[i+2]==piece:
@@ -43,19 +36,11 @@ class State:
                         return [i,i+6,i+12]
                     else:
                         return [i,i+6]
-    
-        # print(piece)
-        # print(self.grid)
-        # print(self.grid.index(piece))
+            i += 1
+  
 
     
     def piece_manhattan_distance(self, piece):
-        # pieces = self.piece_coordinates(piece)
-        # min = (None,None)
-        # for i, piece in enumerate(pieces):
-        #     piece_distance = abs(self.cursor[0]-piece%self.grid_size)+abs(self.cursor[1]-int(piece/self.grid_size))
-        #     min = (pieces[i],piece_distance) if not min[0] or min[1]>piece_distance else min
-        # return min
         min = 12 # 12 is max manhattan distance on 6x6 grid
         distance = []
         piece_coords = self.piece_coordinates(piece)
@@ -103,6 +88,7 @@ class State:
             self.pieces[piece] += [new_pos]
 
         self.cursor = [piece_coord[0]%self.grid_size, int(piece_coord[0]/self.grid_size)]
+        self.selected = piece
         
         return True
     

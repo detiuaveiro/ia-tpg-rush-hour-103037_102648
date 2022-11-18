@@ -1,12 +1,12 @@
+from dataclasses import dataclass
 from typing import List
-from tree_search import SearchDomain
-from IA.Action import Action
+from IA.tree_search import SearchDomain
 from IA.State import State
 
-def pp(str, size):
-    while str:
-        print(str[:size])
-        str = str[size:]
+@dataclass
+class Action:
+    piece: str
+    direction: List[int]
 
 class IA(SearchDomain):
 
@@ -30,24 +30,31 @@ class IA(SearchDomain):
         return newstate
 
     def cost(self, state: State, action: Action) -> int:
-        # 1 + distance from previus cursor position
+        costValue = 0
+        
         distance = state.piece_manhattan_distance(action.piece)
-        return 2 + abs(distance[0])+abs(distance[1])
-        # return 1
+        costValue += abs(distance[0])+abs(distance[1])
+        
+        if state.selected == ' ':
+            costValue += 1
+        elif state.selected != action.piece:
+            costValue += 2
+            
+        return costValue
     
     def heuristic(self, state: State) -> int:
         # heuristic -> number of pieces in front plus numbers of player car moves needed to strait finish
-        # return len([i for i in state.grid[12:18] if i not in {'x','o','A'}])
-        count = 0
-        appear = False
-        for i in range(12,18):
-            if state.grid[i] not in {'x','o','A'}:
-                count += 4
-            elif not appear and state.grid[i] == 'A':
-                appear = True
-            else:
-                count += 1
-        return count
+        return len([i for i in state.grid[12:18] if i not in {'x','o','A'}])
+        # count = 0
+        # appear = False
+        # for i in range(12,18):
+        #     if state.grid[i] not in {'x','o','A'}:
+        #         count += 4
+        #     elif not appear and state.grid[i] == 'A':
+        #         appear = True
+        #     else:
+        #         count += 1
+        # return count
 
     def satisfies(self, state: State) -> bool:
         return state.piece_coordinates("A")[0]==16

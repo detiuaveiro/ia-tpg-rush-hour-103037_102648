@@ -1,11 +1,20 @@
-from binascii import Incomplete
+# The only porpuse of this file is for testing the
+# search tree ability to solve all the levels and
+# optimize its functions
+
+# to run: python3 test_tree_search.py
+
+# can use threads to solve the levels faster 
+# (uncomment the version you wanna use on the main function)
+
+
 from IA.IA import IA
 from IA.State import State
 from IA.tree_search import SearchProblem, SearchTree
 import time
 from multiprocessing import Process, Manager
 
-def calculatePlans():
+def calculateWithThreads():
     manager = Manager()
     plans = manager.dict()
 
@@ -13,18 +22,16 @@ def calculatePlans():
     
     def f_proc(level, plans):
         ia = IA()
-        # print("\nLVL", i+1,"\nTHINKING...")
         initial_state = State({'dimensions': [6, 6], 'level': 1, 'grid': level, 'score': -5, 'game_speed': 10, 'cursor': [3, 3], 'selected': '', 'player': 'eduardo'})
         p = SearchProblem(ia, initial_state)
         t = SearchTree(p)
-        # st = time.time()
+        st = time.time()
         t.search()
-        # et = time.time()
-        # print("PLAN:", level.split(" ")[0], '\nExecution time:', et-st, 'seconds')
-        # plan_len = len(t.plan)
-        # print("actions:",plan_len,"\n\n")
+        et = time.time()
+        print("\nPLAN:", level.split(" ")[0], '\nExecution time:', et-st, 'seconds')
+        plan_len = len(t.plan)
+        print("actions:",plan_len)
         plans[int(level.split(" ")[0])] = [t.plan, t.solutions]
-
 
     total_st = time.time()
 
@@ -39,36 +46,37 @@ def calculatePlans():
         
     total_et = time.time()
     print("\nTotal time:",total_et-total_st)
-    print(plans)
     return plans
-    
-print(calculatePlans())
-# print("Total Actions:",total_actions)
-# print("Incompletes:", incomplete)
 
-# ia = IA()
-# total_st = time.time()
 
-# total_actions = 0
-# incomplete = []
+def calculate():
+    ia = IA()
+    total_st = time.time()
 
-# for i,x in enumerate(f):
-#     # if i+1!=9: continue
-#     print("\nLVL", i+1,"\nTHINKING...")
-#     initial_state = State({'dimensions': [6, 6], 'level': i+1, 'grid': x, 'score': -5, 'game_speed': 10, 'cursor': [3, 3], 'selected': '', 'player': 'eduardo'})
-#     p = SearchProblem(ia, initial_state)
-#     t = SearchTree(p)
-#     st = time.time()
-#     t.search()
-#     et = time.time()
-#     print("PLAN:", 'Execution time:', et-st, 'seconds')
-#     plan_len = len(t.plan)
-#     if plan_len==0: 
-#         incomplete+=[i+1]
-#     print("actions:",plan_len,"\n\n")
-#     total_actions += plan_len
+    total_actions = 0
+    incomplete = []
+    f = open("levels.txt", "r")
+    for i,x in enumerate(f):
+        print("\nLVL", i+1,"\nTHINKING...")
+        initial_state = State({'dimensions': [6, 6], 'level': i+1, 'grid': x, 'score': -5, 'game_speed': 10, 'cursor': [3, 3], 'selected': '', 'player': 'eduardo'})
+        p = SearchProblem(ia, initial_state)
+        t = SearchTree(p)
+        st = time.time()
+        t.search()
+        et = time.time()
+        print("PLAN:", 'Execution time:', et-st, 'seconds')
+        plan_len = len(t.plan)
+        if plan_len==0: 
+            incomplete+=[i+1]
+        print("actions:",plan_len,"\n\n")
+        total_actions += plan_len
 
-# total_et = time.time()
-# print("\nTotal time:",total_et-total_st)
-# print("Total Actions:",total_actions)
-# print("Incompletes:", incomplete)
+    total_et = time.time()
+    print("\nTotal time:",total_et-total_st)
+    print("Total Actions:",total_actions)
+    print("Incompletes:", incomplete)
+
+
+if __name__ == "__main__":
+    calculate()
+    # calculateWithThreads()
