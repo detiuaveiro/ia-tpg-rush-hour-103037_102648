@@ -35,7 +35,7 @@ class IA(SearchDomain):
         distance = state.piece_manhattan_distance(action.piece)
         costValue += abs(distance[0])+abs(distance[1])
         
-        if state.selected == ' ':
+        if state.selected == '':
             costValue += 1
         elif state.selected != action.piece:
             costValue += 2
@@ -44,17 +44,20 @@ class IA(SearchDomain):
     
     def heuristic(self, state: State) -> int:
         # heuristic -> number of pieces in front plus numbers of player car moves needed to strait finish
-        return len([i for i in state.grid[12:18] if i not in {'x','o','A'}])
-        # count = 0
-        # appear = False
-        # for i in range(12,18):
-        #     if state.grid[i] not in {'x','o','A'}:
-        #         count += 4
-        #     elif not appear and state.grid[i] == 'A':
-        #         appear = True
-        #     else:
-        #         count += 1
-        # return count
+        # return len([i for i in state.grid[12:18] if i not in {'x','o','A'}])
+        hValue = 0
+        appear = False
+        for i in range(12,18):
+            if not appear and state.grid[i]=='A':
+                appear = True
+                hValue += 18-i+1
+                i += 1
+                continue
+    
+            
+            if state.grid[i] not in {'x','o'}:
+                hValue += 4
+        return hValue
 
     def satisfies(self, state: State) -> bool:
         return state.piece_coordinates("A")[0]==16

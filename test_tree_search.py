@@ -46,7 +46,7 @@ def calculateWithThreads():
         
     total_et = time.time()
     print("\nTotal time:",total_et-total_st)
-    return plans
+    return plans.values()
 
 
 def calculate():
@@ -54,9 +54,13 @@ def calculate():
     total_st = time.time()
 
     total_actions = 0
+    total_cost = 0
     incomplete = []
+    
+    plans = []
     f = open("levels.txt", "r")
     for i,x in enumerate(f):
+        if len(x)==1: break
         print("\nLVL", i+1,"\nTHINKING...")
         initial_state = State({'dimensions': [6, 6], 'level': i+1, 'grid': x, 'score': -5, 'game_speed': 10, 'cursor': [3, 3], 'selected': '', 'player': 'eduardo'})
         p = SearchProblem(ia, initial_state)
@@ -65,16 +69,21 @@ def calculate():
         t.search()
         et = time.time()
         print("PLAN:", 'Execution time:', et-st, 'seconds')
+        plans[i] = t.plan
         plan_len = len(t.plan)
         if plan_len==0: 
             incomplete+=[i+1]
         print("actions:",plan_len,"\n\n")
         total_actions += plan_len
+        total_cost += t.solution[2]
 
     total_et = time.time()
     print("\nTotal time:",total_et-total_st)
     print("Total Actions:",total_actions)
+    print("Total Cost:", total_cost)
     print("Incompletes:", incomplete)
+    
+    return plans
 
 
 if __name__ == "__main__":

@@ -40,7 +40,7 @@ class State:
   
 
     
-    def piece_manhattan_distance(self, piece):
+    def piece_manhattan_distance(self, piece): # returns the distance
         min = 12 # 12 is max manhattan distance on 6x6 grid
         distance = []
         piece_coords = self.piece_coordinates(piece)
@@ -49,6 +49,19 @@ class State:
             if abs(calc[0]) + abs(calc[1]) < min:
                 min = abs(calc[0]) + abs(calc[1])
                 distance = calc
+        return distance
+    
+    def piece_manhattan_distance2(self, piece): # returns the closest block of piece
+        min = 12 # 12 is max manhattan distance on 6x6 grid
+        distance = []
+        piece_coords = self.piece_coordinates(piece)
+        i = 0
+        for coord in piece_coords:
+            calc = [self.cursor[0]-coord%self.grid_size, self.cursor[1]-int(coord/self.grid_size)]
+            if abs(calc[0]) + abs(calc[1]) < min:
+                min = abs(calc[0]) + abs(calc[1])
+                distance = i
+            i += 1
         return distance
 
     def move(self, piece, direction):
@@ -87,7 +100,9 @@ class State:
             self.grid = self.grid[:new_pos] + piece + self.grid[new_pos+1:]
             self.pieces[piece] += [new_pos]
 
-        self.cursor = [piece_coord[0]%self.grid_size, int(piece_coord[0]/self.grid_size)]
+        closest_piece_cord = self.piece_manhattan_distance2(piece)
+
+        self.cursor = [piece_coord[closest_piece_cord]%self.grid_size, int(piece_coord[closest_piece_cord]/self.grid_size)]
         self.selected = piece
         
         return True
