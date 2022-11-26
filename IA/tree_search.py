@@ -118,8 +118,10 @@ class SearchTree:
         return None
 
     def add_to_open(self, lnewnodes):
-        for node in [newnode for newnode in lnewnodes if newnode.on_solution!=False]:
-            bisect.insort(self.open_nodes, node, key=lambda e: e.on_solution or e.heuristic+e.cost)
+        # for node in [newnode for newnode in lnewnodes if newnode.on_solution!=False]:
+        #     bisect.insort(self.open_nodes, node, key=lambda e: e.on_solution or e.heuristic+e.cost)
+        self.open_nodes.extend(lnewnodes)
+        self.open_nodes.sort(key=lambda e: e.heuristic+e.cost)
         
 if __name__ == "__main__":
     print("helo")
