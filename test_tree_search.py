@@ -57,7 +57,7 @@ def calculate():
     total_cost = 0
     incomplete = []
     
-    plans = []
+    plans = [None]*57
     f = open("levels.txt", "r")
     for i,x in enumerate(f):
         if len(x)==1: break

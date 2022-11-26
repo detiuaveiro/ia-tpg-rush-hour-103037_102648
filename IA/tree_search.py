@@ -128,8 +128,10 @@ class SearchTree:
         return None
 
     def add_to_open(self, lnewnodes):
-        for node in [newnode for newnode in lnewnodes if newnode[6]!=False]:
-            bisect.insort(self.open_nodes, node, key=lambda e: e[6] or e[2]+e[3])
+        self.open_nodes.extend(lnewnodes)
+        self.open_nodes.sort(key=lambda e: e[6] or e[2]+e[3])
+        # for node in [newnode for newnode in lnewnodes if newnode[6]!=False]:
+        #     bisect.insort(self.open_nodes, node, key=lambda e: e[6] or e[2]+e[3])
         
 if __name__ == "__main__":
     print("helo")
