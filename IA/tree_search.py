@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-import bisect
+# import bisect
 
 class SearchDomain(ABC):
     # construtor
