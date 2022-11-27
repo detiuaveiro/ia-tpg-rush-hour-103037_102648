@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from bisect import insort
 
 class SearchDomain(ABC):
     # construtor
@@ -51,6 +52,8 @@ class SearchNode:
         return "no(" + str(self.state) + "," + str(self.parent) + ")"
     def __repr__(self):
         return str(self)
+    def __lt__(self, other):
+        return self.cost+self.heuristic < other.cost+other.heuristic
 
 
 class SearchTree:
@@ -103,7 +106,7 @@ class SearchTree:
                     self.searched_states.add(newstate.grid)
                     added_cost = self.problem.domain.cost(node.state,action)
                     newnode = SearchNode(
-                        newstate,   
+                        newstate,
                         node,
                         cost = node.cost + added_cost,
                         heuristic = self.problem.domain.heuristic(newstate),
@@ -127,10 +130,62 @@ class SearchTree:
     #     elif self.strategy == 'a*':
     #         self.open_nodes.extend(lnewnodes)
     #         self.open_nodes.sort(key=lambda e: e.heuristic+e.cost)
+    
+        
+    
+    
     def add_to_open(self, lnewnodes):
-        # TODO, sort é lento, usar binary tree de futuro
-        self.open_nodes.extend(lnewnodes)
-        self.open_nodes.sort(key=lambda e: e.heuristic+e.cost)
+        # self.open_nodes.extend(lnewnodes)
+        # self.open_nodes.sort()
+        lnewnodes.sort()
+        for i in lnewnodes:
+            insort(self.open_nodes, i)
+        # for i in lnewnodes
+        # lnewnodes.sort(key=lambda e: e.heuristic+e.cost)
+        # arr1 = self.open_nodes
+        # arr2 = lnewnodes
+        # arr3 = [None]*(len(arr1)+len(arr2))
+        # i, j, k = 0, 0, 0
+        
+        # while i < len(arr1) and j < len(arr2):
+        #     if arr1[i].cost+arr1[i].heuristic < arr2[j].cost+arr2[j].heuristic:
+        #         arr3[k] = arr1[i]
+        #         k += 1
+        #         i += 1
+        #     else:
+        #         arr3[k] = arr2[j]
+        #         k += 1
+        #         j += 1
+                
+        # while i < len(arr1):
+        #     arr3[k] = arr1[i];
+        #     k += 1
+        #     i += 1
+            
+        # while j < len(arr2):
+        #     arr3[k] = arr2[j];
+        #     k += 1
+        #     j += 1
+        
+        # self.open_nodes = arr3
+        # self.open_nodes = list(merge(self.open_nodes, lnewnodes, key=lambda e: e.heuristic+e.cost))
+        # self.open_nodes = sorted(self.open_nodes + lnewnodes, key=lambda e: e.heuristic+e.cost)
+        # if ln(lnewnodes)==0:
+        #     return
+        # lnewnodes.sort(key=lambda e: e.heuristic+e.cost)
+        # n = None
+        # i = 0
+        # while i < len(self.open_nodes):
+        #     if n==None:
+        #         n = lnewnodes.pop(0)
+        #     if n.cost+n.heuristic < self.open_nodes[i].cost+self.open_nodes[i].heuristic:
+        #         self.open_nodes.insert(i, n)
+        #         if len(lnewnodes)==0:
+        #             break
+        #         n = None
+        #     i += 1
+        # self.open_nodes = self.open_nodes + lnewnodes
+        # print([a.cost+a.heuristic for a in self.open_nodes])
 
 if __name__ == "__main__":
     print("helo")

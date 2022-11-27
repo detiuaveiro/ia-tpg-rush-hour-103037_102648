@@ -9,7 +9,7 @@ f = open("levels.txt", "r")
 ia = IA()
 total_st = time.time()
 for i,x in enumerate(f):
-    # if i+1!=9: continue
+    # if i+1>3: continue
     print("\nLVL", i+1,"\nTHINKING...")
     initial_state = State({'dimensions': [6, 6], 'level': i+1, 'grid': x, 'score': -5, 'game_speed': 10, 'cursor': [3, 3], 'selected': '', 'player': 'eduardo'})
     p = SearchProblem(ia, initial_state)

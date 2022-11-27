@@ -24,16 +24,72 @@ class State:
             return self.grid[cursor[1]*self.grid_size+cursor[0]]
     
     def piece_coordinates(self, piece: str):
-        return [i for i,s in enumerate(self.grid) if s==piece]
-
+        # if piece in self.grid:
+        #     return self.grid[piece]
+        # cords = [i for i in range(36) if self.grid[i]==piece]
+        # return cords
     
-    def piece_manhattan_distance(self, piece):
-        pieces = self.piece_coordinates(piece)
-        min = (None,None)
-        for i, piece in enumerate(pieces):
-            piece_distance = abs(self.cursor[0]-piece%self.grid_size)+abs(self.cursor[1]-int(piece/self.grid_size))
-            min = (pieces[i],piece_distance) if not min[0] or min[1]>piece_distance else min
-        return min
+        i = self.grid.index(piece)
+        if self.grid[i]==piece:
+            if self.grid[i+1]==piece:
+                if (i+2)%6!=0 and self.grid[i+2]==piece:
+                    return [i,i+1,i+2]
+                else:
+                    return [i,i+1]
+            else:
+                if (i+12)<=35 and self.grid[i+12]==piece:
+                    return [i,i+6,i+12]
+                else:
+                    return [i,i+6]
+        # print(self.grid, res)
+        # exit(0)
+    
+        # i = 0
+        # while i < 36:
+        #     if self.grid[i]==piece:
+        #         if self.grid[i+1]==piece:
+        #             if (i+2)%6!=0 and self.grid[i+2]==piece:
+        #                 return [i,i+1,i+2]
+        #             else:
+        #                 return [i,i+1]
+        #         else:
+        #             if (i+12)<=35 and self.grid[i+12]==piece:
+        #                 return [i,i+6,i+12]
+        #             else:
+        #                 return [i,i+6]
+        #     i += 1
+
+    def piece_manhattan_distance(self, piece): # returns the distance
+        min = 12 # 12 is max manhattan distance on 6x6 grid
+        distance = (None,None)
+        piece_coords = self.piece_coordinates(piece)
+        for coord in piece_coords:
+            calc = [self.cursor[0]-coord%self.grid_size, self.cursor[1]-int(coord/self.grid_size)]
+            if abs(calc[0]) + abs(calc[1]) < min:
+                min = abs(calc[0]) + abs(calc[1])
+                distance = (coord, min)
+        return distance
+    
+    def piece_manhattan_distance2(self, piece): # returns the closest block of piece
+        min = 12 # 12 is max manhattan distance on 6x6 grid
+        distance = []
+        piece_coords = self.piece_coordinates(piece)
+        i = 0
+        for coord in piece_coords:
+            calc = [self.cursor[0]-coord%self.grid_size, self.cursor[1]-int(coord/self.grid_size)]
+            if abs(calc[0]) + abs(calc[1]) < min:
+                min = abs(calc[0]) + abs(calc[1])
+                distance = i
+            i += 1
+        return distance
+    
+    # def piece_manhattan_distance(self, piece):
+    #     pieces = self.piece_coordinates(piece)
+    #     min = (None,None)
+    #     for i, piece in enumerate(pieces):
+    #         piece_distance = abs(self.cursor[0]-piece%self.grid_size)+abs(self.cursor[1]-int(piece/self.grid_size))
+    #         min = (pieces[i],piece_distance) if not min[0] or min[1]>piece_distance else min
+    #     return min
 
     def move(self, piece, direction):
         assert piece!=self.wall_tile
@@ -72,6 +128,7 @@ class State:
 
         manhattan = self.piece_manhattan_distance(piece)
         self.cursor = [manhattan[0]%self.grid_size, int(manhattan[0]/self.grid_size) ]
+        self.selected = piece
         
         return True
 

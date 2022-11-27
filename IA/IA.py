@@ -30,12 +30,22 @@ class IA(SearchDomain):
         return newstate
 
     def cost(self, state: State, action: Action) -> int:
-        # 1 + distance from previus cursor position
-        return 1 + state.piece_manhattan_distance(action.piece)[1]/12 # 12 is the max distance, 1 <= cost <= 2
+        costValue = 0
+        
+        costValue += state.piece_manhattan_distance(action.piece)[1]
+        
+        if state.selected == '':
+            costValue += 1
+        elif state.selected != action.piece:
+            costValue += 2
+            
+        return costValue
+    
     
     def heuristic(self, state: State) -> int:
         # heuristic -> number of pieces in front plus numbers of player car moves needed to strait finish
-        return len([i for i in state.grid[12:18] if i not in {'x','o','A'}]) + (17-state.piece_coordinates("A")[1])
+        a = state.piece_coordinates("A")[1]
+        return len([i for i in state.grid[a+1:18] if i not in {'x','o','A'}]) + (17-a)
 
     def satisfies(self, state: State) -> bool:
         return state.piece_coordinates("A")[1]==17

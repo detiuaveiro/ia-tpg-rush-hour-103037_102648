@@ -11,7 +11,7 @@ from common import Coordinates, Map, MapException
 logger = logging.getLogger("Game")
 logger.setLevel(logging.DEBUG)
 
-GAME_SPEED = 10
+GAME_SPEED = 50
 CRAZY_STEP = 10
 
 LEVEL: Dict[int, Map] = {}

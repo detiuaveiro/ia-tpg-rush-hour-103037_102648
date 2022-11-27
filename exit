@@ -1,0 +1,113 @@
+[33mcommit 34c744263f63a343d11cf048784ac9727cf7dafd[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: EduardoFernandesUA <edu.fernandes@ua.pt>
+Date:   Sat Nov 26 01:33:08 2022 +0000
+
+    solved python version issue
+
+[33mcommit 228643d743253da568642417081774e085d3f4a0[m
+Author: EduardoFernandesUA <edu.fernandes@ua.pt>
+Date:   Mon Nov 21 09:27:04 2022 +0000
+
+    middle commit
+
+[33mcommit 3862aac8d272e3ef18185ef88a2c22a119606fbd[m
+Author: EduardoFernandesUA <edu.fernandes@ua.pt>
+Date:   Sun Nov 20 14:55:42 2022 +0000
+
+    a
+
+[33mcommit 349e63a6da1ce04b7fd192cd63d6df4e6f3a98a9[m
+Author: EduardoFernandesUA <edu.fernandes@ua.pt>
+Date:   Fri Nov 18 23:01:39 2022 +0000
+
+    first evaluation commit
+
+[33mcommit 2f41478adea18cf1e8059137f4e45f6e524212b2[m
+Author: João Afonso <74464325+joaoafonso02@users.noreply.github.com>
+Date:   Fri Nov 18 20:51:14 2022 +0000
+
+    Update README.md
+
+[33mcommit a2a1d0b2add18416daf67a5faf05d0b76f6d23ff[m
+Author: EduardoFernandesUA <edu.fernandes@ua.pt>
+Date:   Mon Oct 31 09:43:28 2022 +0000
+
+    update heuristic
+
+[33mcommit 68699b0c895aaffc5eff89bec5db9387bc81c830[m
+Author: EduardoFernandesUA <edu.fernandes@ua.pt>
+Date:   Wed Nov 2 12:20:34 2022 +0000
+
+    updated the slowest function "piece_coordinates"
+
+[33mcommit b5b177d00a5ab3ded2adb5da0dda01ca2939987f[m
+Author: EduardoFernandesUA <edu.fernandes@ua.pt>
+Date:   Sun Oct 30 22:16:46 2022 +0000
+
+    updated the slowest function "piece_coordinates"
+
+[33mcommit 5dea30225d29ee2cf8d2fbc083f56570ba01ab44[m
+Author: João Afonso <ferreiraafonsojoao@ua.pt>
+Date:   Mon Oct 24 09:19:27 2022 +0100
+
+    readme
+
+[33mcommit 109189f6088a19bcde42b460565a73d8d4b8c1db[m
+Author: João Afonso <74464325+joaoafonso02@users.noreply.github.com>
+Date:   Sat Oct 22 22:33:29 2022 +0100
+
+    Update README.md
+
+[33mcommit 76a68ad8532670dcb0426580ccc6f4dd550d58a4[m
+Author: EduardoFernandesUA <edu.fernandes@ua.pt>
+Date:   Sat Oct 22 22:11:36 2022 +0100
+
+    add warning to readme
+
+[33mcommit da026b3e6390592946870726dae7d42ce99010a3[m
+Author: João Afonso <ferreiraafonsojoao@ua.pt>
+Date:   Sat Oct 22 10:10:33 2022 +0100
+
+    +
+
+[33mcommit 815b7b84359a7c795d38a8a6cf6e9e179db5e557[m
+Author: João Afonso <74464325+joaoafonso02@users.noreply.github.com>
+Date:   Sat Oct 22 09:56:47 2022 +0100
+
+    Update README.md
+
+[33mcommit a87a16f9bc7f7634323039cdc70525e502ada5d7[m
+Author: João Afonso <ferreiraafonsojoao@ua.pt>
+Date:   Sat Oct 22 09:55:48 2022 +0100
+
+    +
+
+[33mcommit 472c52276c8902fef97d2dcdf3af6014e8c364a4[m
+Author: EduardoFernandesUA <edu.fernandes@ua.pt>
+Date:   Sat Oct 22 21:53:23 2022 +0100
+
+    v2 final
+
+[33mcommit 9a4a7dac02376cc41bb678e19ed5569406de72dc[m
+Author: EduardoFernandesUA <edu.fernandes@ua.pt>
+Date:   Thu Oct 20 16:09:45 2022 +0100
+
+    FINAL V1
+
+[33mcommit 4d105bc52fca045fbdd12ae4b3db2d114aaa46d1[m
+Author: EduardoFernandesUA <edu.fernandes@ua.pt>
+Date:   Tue Oct 18 23:56:47 2022 +0100
+
+    newcommin
+
+[33mcommit eb3f63174ad0a2f3b8f11d05403caa6af245b4cf[m
+Author: João Afonso <ferreiraafonsojoao@ua.pt>
+Date:   Tue Oct 18 18:37:19 2022 +0100
+
+    deteled
+
+[33mcommit 405f5133955d89afc8210ae415369c91c4a1b11e[m
+Author: EduardoFernandesUA <edu.fernandes@ua.pt>
+Date:   Tue Oct 18 16:50:58 2022 +0100
+
+    workings

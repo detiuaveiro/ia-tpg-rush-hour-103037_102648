@@ -26,31 +26,37 @@ def solve_puzzle(server_state):
     return t.plan
 
 def getNextMove(server_state, plan):
+    if not plan:
+        return None, None
+    
     cursor = server_state['cursor']
     selected = server_state['selected']
 
     action: Action = plan[0]
     state: State = State(server_state)
     # test if some piece moved randomly and blocked current move
-    if not state.move(action.piece, action.direction): 
+    if state.move(action.piece, action.direction)==None: 
         return None, None
     state.move(action.piece, [action.direction[0]*-1, action.direction[1]*-1]) # undo test move
 
     if selected!=action.piece: # piece not selected
-        if selected!="": return " ", plan # disselect wrong piece
+        if selected!="":
+            return " ", plan # disselect wrong piece
 
         piece_cood0 = state.piece_manhattan_distance(action.piece)[0]
         piece_cood0 = [piece_cood0%state.grid_size, int(piece_cood0/state.grid_size)]
         distance = [ (cursor[0]-piece_cood0[0]) , (cursor[1]-piece_cood0[1]) ]
 
-        if abs(distance[0])+abs(distance[1]) != 0:
-            if distance[0]!=0: return "a" if distance[0]>0 else "d", plan # move cursor horizontaly
-            if distance[1]!=0: return "w" if distance[1]>0 else "s", plan # move cursor vertically
-        else:
-            return " ", plan # select piece
+        
+        if distance[0]!=0: return "a" if distance[0]>0 else "d", plan # move cursor horizontaly
+        if distance[1]!=0: return "w" if distance[1]>0 else "s", plan # move cursor vertically
+        return " ", plan # select piece
     else: # right piece selected
-        if action.direction[0]!=0: return "a" if action.direction[0]<0 else "d", plan[1:] # move piece horizontaly
-        if action.direction[1]!=0: return "w" if action.direction[1]<0 else "s", plan[1:] # move piece vertically
+        plan.pop(0)
+        if action.direction[0]!=0: 
+            return "a" if action.direction[0]<0 else "d", plan # move piece horizontaly
+        if action.direction[1]!=0: 
+            return "w" if action.direction[1]<0 else "s", plan # move piece vertically
 
     return None, None
 
@@ -67,16 +73,13 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
             try:
                 server_state = json.loads( await websocket.recv() )  # receive game update, this must be called timely or your game will get out of sync with the server
                 
-                if not plan:
-                    print("NOT PLAN")
-                    plan = solve_puzzle(server_state)
-                    continue
-                
                 key, plan = getNextMove(server_state,plan)
 
                 if not key: 
-                    print("NOT KEY")
+                    print("\nNOT KEY")
                     plan = solve_puzzle(server_state)
+                    print(server_state)
+                    print(plan)
                     continue
                 
                 await websocket.send(json.dumps({"cmd": "key", "key": key}))  
