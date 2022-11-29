@@ -1,6 +1,3 @@
-# WARNING
-Needs python 3.10.x or above to run, due to a standard library named "bisect"
-
 # ia-rush
 Projecto de Inteligência Artificial 2022 - Rush Hour
 
@@ -36,8 +33,3 @@ python -m pygame.examples.aliens
 
 # Tested on:
 - OSX Monterey 12.5.1
-- OSX Monterey 12.2 
-
-## Authors
-[João Afonso Ferreira](https://github.com/joaoafonso02), 103037  
-[Eduardo Fernandes](https://github.com/EduardoFernandesUA), 102648  

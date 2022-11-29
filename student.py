@@ -1,101 +1,92 @@
+"""Example client."""
 import asyncio
 import getpass
 import json
 import os
-from IA.State import State
-from IA.IA import IA, Action
-from IA.tree_search import SearchProblem, SearchTree
-from test_tree_search import calculate, calculateWithThreads
 
-import time
-
+# Next 4 lines are not needed for AI agents, please remove them from your code!
+import pygame
 import websockets
 
+from IA.Tree_Search import Tree_Search
+from IA.Game import Game
 
-######################################################################
-# functions used for cursor movement
-
-def solve_puzzle(server_state, current_level = 0, solutions = {}):
-    print("\nLevel",server_state['level'])
-    if server_state['level']!=current_level:
-        current_level = server_state['level']
-        solutions = {}
-    print("THINKING...")
-    st = time.time()
-    agent = IA()
-    initial_state = State(server_state)
-    p = SearchProblem(agent, initial_state, solutions)
-    t = SearchTree(p)
-    t.search()
-    print("Done in", time.time()-st)
-    print("Plan len:",len(t.plan))
-    return t.plan, t.solutions
-
-def getNextMove(server_state, plan):
-    selected = server_state['selected']
-    action: Action = plan[0]
-    state: State = State(server_state)
-    
-    # test if some piece moved randomly and blocked current move
-    if not state.testmove(action.piece, action.direction): 
+def getNextMove(game, plan):
+    if plan==None or len(plan)==0:
         return None, None
-
-    if selected!=action.piece: # piece not selected
-        if selected!="": return " ", plan # disselect wrong piece
-        distance = state.piece_manhattan_distance(action.piece)
-        if abs(distance[0])+abs(distance[1]) != 0:
-            if distance[0]!=0: return "a" if distance[0]>0 else "d", plan # move cursor horizontaly
-            if distance[1]!=0: return "w" if distance[1]>0 else "s", plan # move cursor vertically
-        else:
-            return " ", plan # select piece
-    else: # right piece selected
-        if action.direction[0]!=0: return "a" if action.direction[0]<0 else "d", plan[1:] # move piece horizontaly
-        if action.direction[1]!=0: return "w" if action.direction[1]<0 else "s", plan[1:] # move piece vertically
-
+    piece, direction, positions = plan[0]
+    size = game['dimensions']
+    print(game)
+    print(plan[0])
+    
+    # server_state = game['grid'].split(" ")[1]
+    # if not Game.canMove(server_state, plan[0]):
+    #     return None, None
+    
+    # print(plan)
+    if game['selected']==piece: # action piece selected
+        # if 
+        plan.pop(0)
+        if direction[0]!=0: return "a" if direction[0]<0 else "d", plan # move cursor horizontaly
+        if direction[1]!=0: return "w" if direction[1]<0 else "s", plan # move cursor vertically
+    else:
+        if game['selected']!="":
+            return " ", plan
+        cX, cY = game['cursor']
+        pX, pY = positions[0]%size[0], int(positions[0]/size[1])
+        dX = cX - pX
+        dY = cY - pY
+        if dX!=0: return "a" if dX>0 else "d", plan # move cursor horizontaly
+        if dY!=0: return "w" if dY>0 else "s", plan # move cursor vertically
+        grid = game['grid'].split(" ")[1]
+        print(grid[cY*game['dimensions'][0]+cX])
+        if grid[cY*game['dimensions'][0]+cX]==piece:
+            return " ", plan # on the right piece
+    
     return None, None
 
-######################################################################
-
-
-
-from array import array
 async def agent_loop(server_address="localhost:8000", agent_name="student"):
+    """Example client loop."""
     async with websockets.connect(f"ws://{server_address}/player") as websocket:
-
-        plans = calculateWithThreads()
 
         # Receive information about static game properties
         await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
-        await websocket.recv() # clear server queue
-
-        current_level = 0
-        solutions = {}
-        plan = []
+        game = json.loads( await websocket.recv() )
         
+        plan = None
+        # solutions = set()
+        # curr_level = 1
+
         while True:
-            try:
-                server_state = json.loads( await websocket.recv() )  # receive game update, this must be called timely or your game will get out of sync with the server
-                
-                if not plan:
-                    plan,solutions = plans[server_state["level"]-1]
-                # print(len(plan))
-                
-                if not plan:
-                    plan, solutions = solve_puzzle(server_state, current_level, solutions)
-                    continue
-                
-                key, plan = getNextMove(server_state,plan)
+            game = json.loads( await websocket.recv() )  # receive game update, this must be called timely or your game will get out of sync with the server
 
-                if not key: 
-                    plan,solutions = solve_puzzle(server_state, current_level, solutions)
-                    key, plan = getNextMove(server_state,plan)
-                
-                await websocket.send(json.dumps({"cmd": "key", "key": key}))
+            # if curr_level!=game['level']:
+            #     solutions = set()
+            #     plan = None
+            #     curr_level = game['level']
+            #     game = json.loads( await websocket.recv() )
 
-            except websockets.exceptions.ConnectionClosedOK:
-                print("Server has cleanly disconnected us") 
-                return
+            # if not plan:
+            #     print("\nThinking")
+            #     tree = Tree_Search(game)
+            #     plan = tree.search()
+            #     # solutions = tree.solutions
+            #     print("Done")
+            #     # continue
 
+            key, plan = getNextMove(game, plan)
+            
+            if key==None or plan==None:
+                print("\nThingking")
+                tree = Tree_Search(game)
+                plan = tree.search()
+                print("Done")
+                continue
+            
+            print("KEY:",key)
+
+            await websocket.send( json.dumps({"cmd": "key", "key": key}) )  # send key command to server - you must implement this send in the AI agent
+            
 
 # DO NOT CHANGE THE LINES BELLOW
 # You can change the default values using the command line, example:
