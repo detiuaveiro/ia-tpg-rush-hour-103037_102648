@@ -16,8 +16,8 @@ def getNextMove(game, plan):
         return None, None
     piece, direction, positions = plan[0]
     size = game['dimensions']
-    print(game)
-    print(plan[0])
+    # print(game)
+    # print(plan[0])
     
     # server_state = game['grid'].split(" ")[1]
     # if not Game.canMove(server_state, plan[0]):
@@ -57,9 +57,11 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
         # solutions = set()
         # curr_level = 1
 
+        
+
         while True:
             game = json.loads( await websocket.recv() )  # receive game update, this must be called timely or your game will get out of sync with the server
-
+            
             # if curr_level!=game['level']:
             #     solutions = set()
             #     plan = None
@@ -76,14 +78,15 @@ async def agent_loop(server_address="localhost:8000", agent_name="student"):
 
             key, plan = getNextMove(game, plan)
             
-            if key==None or plan==None:
-                print("\nThingking")
+            if key==None or plan==None: 
+                print("\nLevel", game['level'])
+                print("\nThinking")
                 tree = Tree_Search(game)
                 plan = tree.search()
                 print("Done")
                 continue
             
-            print("KEY:",key)
+            #print("KEY:",key)
 
             await websocket.send( json.dumps({"cmd": "key", "key": key}) )  # send key command to server - you must implement this send in the AI agent
             
