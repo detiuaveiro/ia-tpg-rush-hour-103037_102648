@@ -46,43 +46,46 @@ class Game:
             i+=1
         return actions
     
-    def result(state, action): # assumes move is possible
-        w = int(len(state)**(1/2))
-        newstate = state
+    def result(node, action): # assumes move is possible
+        # calculate newstate
+        w = int(len(node[0])**(1/2))
+        newstate = node[0]
         for i in action[2]:
             newstate = newstate[:i] + "o" + newstate[i+1:]
+        md_value = w*w+1
         for i in action[2]:
             new_i = i+w*action[1][1]+action[1][0]
+            dist = abs(node[5][0]-action[1][0]) + abs(node[5][1]-action[1][1])
+            if dist < md_value:
+                newcursor = [new_i%w, new_i//w]
+                md_value = dist
             newstate = newstate[:new_i] + action[0] + newstate[new_i+1:]
-        return newstate
+        # print(newstate, newcursor)
+        return newstate, newcursor
     
-    def cost(newAction, oldAction): # action corresponds to the last action of the last node, this is used to find the atual location of the cursor, (3,3) is the initial location
-        # if oldAction==None: 
-        #     oldAction = ("", (0,0), (21,))
-        # counter = 0
-        # if newAction[0]==oldAction[0]: 
-        #     return 1
-        # else: counter+=2
-        # ox, oy = oldAction[2][0]%6, int(oldAction[2][0]/6)
-        # nx, ny = newAction[2][0]%6, int(newAction[2][0]/6)
-        # dx, dy = nx-ox, ny-oy
-        # return counter + abs(dx)+abs(dy)+1
-        return 1
+    def cost(newAction, node, newcursor): # action corresponds to the last action of the last node, this is used to find the atual location of the cursor, (3,3) is the initial location
+        if newAction[0]==node[4][0]: # same piece (no need to select and no need to move to piece)
+            return 1
+        cost = abs(node[5][0]-newcursor[0]) + abs(node[5][1]-newcursor[1])
+        return cost+2
+        if newAction[0]==node[4][0]:
+            return 1
+        return 3
     
     def heuristic(state, goal):
         counter = 0
         i = goal
         while state[i]!='A':
-            counter+=1
+            if state[i]!='o':
+                counter+=3
+            else:
+                counter+=1
             i-=1
         return counter
     
     def canMove(state, action):
         w = int(len(state)**(1/2))
         w2 = len(state)
-        # for i in action[2]:
-        #     if state[i]!=action[0]:
-        #         return False
         for i in action[2]:
             if state[i]!=action[0]:
                 return False
