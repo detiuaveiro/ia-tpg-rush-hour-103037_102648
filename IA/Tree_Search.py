@@ -72,41 +72,4 @@ class Tree_Search:
         self.open_nodes.insert(lo, x)
         return lo
 
-    
-    def insertOpenNode(self, newstate):
-        left = 0
-        right = len(self.open_nodes)-1
-
-        if right==-1:
-            self.open_nodes = [newstate]
-            return
-
-        node = self.nodes[newstate]
-        value = node[2]+node[3]
-        print(value," ",end="")
-
-        # if right==0:
-        #     if self.nodes[self.open_nodes[0]][2]+self.nodes[self.open_nodes[0]][3] < value:
-        #         self.open_nodes = self.open_nodes + [newstate]
-        #     else:
-        #         self.open_nodes = [newstate] + self.open_nodes
-        #     return
-
-        # print("LOOP", value, "left:",left, "right:", right)
-        while True:
-            # print("l:",left,"  r:", right)
-            if left==right or right<left:
-                if value > self.nodes[self.open_nodes[left]][2]+self.nodes[self.open_nodes[left]][3]:
-                    self.open_nodes = self.open_nodes[:left-1] + [newstate] + self.open_nodes[left-1:]
-                else:
-                    self.open_nodes = self.open_nodes[:left] + [newstate] + self.open_nodes[left:]
-                break
-                
-            middle = left+int((right-left)/2)
-            middleNode = self.nodes[self.open_nodes[middle]]
-            # print("middle",middle, middleNode[2]+middleNode[3])
-            if middleNode[2]+middleNode[3] < value:
-                left = middle+1
-            else:
-                right = middle
                 
